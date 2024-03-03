@@ -1,0 +1,12 @@
+Package: sparse.llt
+Type: Package
+Title: Performs sparse LLT decomposition to sample from a multivariate normal for some Bayesian models
+Version: 1.0
+Date: 2024-03-03
+Encoding: UTF-8
+Author: Jon Lachmann
+Maintainer: Jon Lachmann <jon@lachmann.nu>
+Description: Uses the fast faer rust library for sparse supernodal LLT decomposition
+License: GPL-3
+Config/rextendr/version: 0.3.1
+RoxygenNote: 7.2.3

@@ -1,0 +1,13 @@
+[package]
+name = 'sparse_llt'
+version = '0.1.0'
+edition = '2021'
+
+[lib]
+crate-type = [ 'staticlib' ]
+name = 'sparse_llt'
+
+[dependencies]
+extendr-api = '*'
+faer = { git = "https://github.com/sarah-ek/faer-rs.git" }
+dyn-stack = "0.10.0"
