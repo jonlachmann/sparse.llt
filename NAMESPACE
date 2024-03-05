@@ -2,4 +2,5 @@
 
 export(beta_draw)
 export(beta_symbolic)
+export(symbolic_union)
 useDynLib(sparse.llt, .registration = TRUE)

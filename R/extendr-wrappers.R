@@ -17,7 +17,11 @@ beta_symbolic <- function(invomega0, x_invsigma_x) .Call(wrap__beta_symbolic, in
 
 #' Draw beta from N(omegabar * x_invsigma_y, omegabar)
 #' @export
-beta_draw <- function(invomega0, x_invsigma_x, x_invsigma_y, random_vec, symb) .Call(wrap__beta_draw, invomega0, x_invsigma_x, x_invsigma_y, random_vec, symb)
+beta_draw <- function(invomega0, x_invsigma_x, x_invsigma_y, random_vec, symb, symb2) .Call(wrap__beta_draw, invomega0, x_invsigma_x, x_invsigma_y, random_vec, symb, symb2)
+
+#' Calculate the symbolic union of two sparse matrices to speed up future binary operations between the two
+#' @export
+symbolic_union <- function(lhs, rhs) .Call(wrap__symbolic_union, lhs, rhs)
 
 
 # nolint end

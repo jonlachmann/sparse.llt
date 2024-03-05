@@ -9,5 +9,6 @@ name = 'sparse_llt'
 
 [dependencies]
 extendr-api = '*'
-faer = { git = "https://github.com/sarah-ek/faer-rs.git" }
+#faer = { git = "https://github.com/sarah-ek/faer-rs.git" }
+faer = { path = "/Users/jonlachmann/RustroverProjects/faer-rs" }
 dyn-stack = "0.10.0"

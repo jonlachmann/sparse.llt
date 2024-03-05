@@ -4,7 +4,7 @@
 \alias{beta_draw}
 \title{Draw beta from N(omegabar * x_invsigma_y, omegabar)}
 \usage{
-beta_draw(invomega0, x_invsigma_x, x_invsigma_y, random_vec, symb)
+beta_draw(invomega0, x_invsigma_x, x_invsigma_y, random_vec, symb, symb2)
 }
 \description{
 Draw beta from N(omegabar * x_invsigma_y, omegabar)

@@ -29,6 +29,22 @@ fn load_dgc_matrix<'a>(mat: S4, x: &'a Robj) -> faer::sparse::SparseColMatRef<'a
     return a_mat;
 }
 
+/// Calculate the symbolic union of two sparse matrices to speed up future binary operations between the two
+/// @export
+#[extendr]
+fn symbolic_union(lhs: S4, rhs: S4) -> Robj {
+    let lhs_x = lhs.get_slot("x").unwrap();
+    let lhs_mat = load_dgc_matrix(lhs, &lhs_x);
+
+    let rhs_x = rhs.get_slot("x").unwrap();
+    let rhs_mat = load_dgc_matrix(rhs, &rhs_x);
+
+    let symbolic = faer::sparse::ops::union_symbolic(lhs_mat.symbolic(), rhs_mat.symbolic()).unwrap();
+    let externalptr_symb = ExternalPtr::new(symbolic);
+
+    return externalptr_symb.into()
+}
+
 /// Perform a symbolic decomposition of invomega0 + x_invsigma_x and return a pointer to it
 /// @export
 #[extendr]
@@ -67,10 +83,14 @@ fn beta_symbolic(invomega0: S4, x_invsigma_x: S4) -> Robj {
 /// Draw beta from N(omegabar * x_invsigma_y, omegabar)
 /// @export
 #[extendr]
-unsafe fn beta_draw(invomega0: S4, x_invsigma_x: S4, x_invsigma_y: &[f64], random_vec: &[f64], symb: Robj) -> Vec<f64> {
+unsafe fn beta_draw(invomega0: S4, x_invsigma_x: S4, x_invsigma_y: &[f64], random_vec: &[f64], symb: Robj, symb2: Robj) -> Vec<f64> {
     // Get the symbolic decomposition from the pointer
     let symbolic_ptr: ExternalPtr<faer::sparse::linalg::cholesky::supernodal::SymbolicSupernodalCholesky<u32>> = symb.try_into().unwrap();
     let symbolic = symbolic_ptr.addr();
+
+    // Get the symbolic target matrix from the pointer
+    let symbolic2_ptr: ExternalPtr<faer::sparse::SymbolicSparseColMat<u32>> = symb2.try_into().unwrap();
+    let symbolic2 = symbolic2_ptr.addr();
 
     // Map invomega0 and x_invsigma_x
     let invomega0_x = invomega0.get_slot("x").unwrap();
@@ -79,7 +99,17 @@ unsafe fn beta_draw(invomega0: S4, x_invsigma_x: S4, x_invsigma_y: &[f64], rando
     let x_invsigma_x_x = x_invsigma_x.get_slot("x").unwrap();
     let x_invsigma_x_mat = load_dgc_matrix(x_invsigma_x, &x_invsigma_x_x);
 
-    let invomegabar = invomega0_mat + x_invsigma_x_mat;
+    let x = &mut *vec![0f64; symbolic2.row_indices().len()];
+
+    let mut invomegabar = faer::sparse::SparseColMatMut::<u32, f64>::new({
+            symbolic2.as_ref()
+        },
+        x
+    );
+
+    faer::sparse::ops::add_into(invomegabar.rb_mut(), invomega0_mat, x_invsigma_x_mat);
+
+    //let invomegabar = invomega0_mat + x_invsigma_x_mat;
 
     // Copy x_invsigma_y into owned memory and map it to a matrix
     let mut x_invsigma_y_bind = x_invsigma_y.to_owned();
@@ -137,4 +167,5 @@ extendr_module! {
     mod sparse_llt;
     fn beta_symbolic;
     fn beta_draw;
+    fn symbolic_union;
 }
